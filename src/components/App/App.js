@@ -1,5 +1,5 @@
-import Game from '../Game';
-import Header from '../Header';
+import Header from "../Header";
+import Game from "../Game";
 
 function App() {
   return (
