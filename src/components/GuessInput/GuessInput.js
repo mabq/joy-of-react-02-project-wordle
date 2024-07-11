@@ -4,18 +4,18 @@ import { CHARACTERS_PER_WORD } from "../../constants";
 
 import VirtualKeyboard from "./VirtualKeyboard";
 
-function GuessInput({ submitGuess, keyboardStatus, disabled }) {
-  const [value, setValue] = React.useState("");
+function GuessInput({ submitGuess, keyResults, disabled }) {
+  const [inputValue, setInputValue] = React.useState("");
 
   function handleSubmit(event) {
     event.preventDefault();
-    submitGuess(value);
-    setValue(""); // reset input form after submit
+    submitGuess(inputValue);
+    setInputValue(""); // reset input form after submit
   }
 
-  function handleButtonPress(key) {
-    if (value.length < CHARACTERS_PER_WORD) {
-      setValue(value + key);
+  function handleLetterButtonPress(key) {
+    if (inputValue.length < CHARACTERS_PER_WORD) {
+      setInputValue(inputValue + key);
     }
   }
 
@@ -34,16 +34,15 @@ function GuessInput({ submitGuess, keyboardStatus, disabled }) {
           maxLength={CHARACTERS_PER_WORD}
           pattern={`[A-Z]{${CHARACTERS_PER_WORD}}`}
           title="5 letter word"
-          value={value}
-          onChange={(event) => setValue(event.target.value.toUpperCase())}
+          value={inputValue}
+          onChange={(event) => setInputValue(event.target.value.toUpperCase())}
         />
       </form>
-      {!disabled && (
-        <VirtualKeyboard
-          keyboardStatus={keyboardStatus}
-          handleButtonPress={handleButtonPress}
-        />
-      )}
+      <VirtualKeyboard
+        keyResults={keyResults}
+        disabled={disabled}
+        handleLetterButtonPress={handleLetterButtonPress}
+      />
     </>
   );
 }

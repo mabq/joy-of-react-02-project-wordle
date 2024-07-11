@@ -1,40 +1,52 @@
 import React from "react";
 
-function VirtualKeyboard({ keyboardStatus, handleButtonPress }) {
-  const rowLetters = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+const ROW_LETTERS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+
+function VirtualKeyboard({ keyResults, handleLetterButtonPress, disabled }) {
   return (
     <div className="keyboard-wrapper">
-      {rowLetters.map((letters, index) => (
+      {ROW_LETTERS.map((letters, index) => (
         <RowLetters
           key={index}
           letters={letters}
-          handleKeypress={handleButtonPress}
-          keyboardStatus={keyboardStatus}
+          handleLetterButtonPress={handleLetterButtonPress}
+          keyResults={keyResults}
+          disabled={disabled}
         />
       ))}
     </div>
   );
 }
 
-function RowLetters({ letters, handleKeypress, keyboardStatus }) {
+function RowLetters({
+  letters,
+  handleLetterButtonPress,
+  keyResults,
+  disabled,
+}) {
   return (
     <div className="key-row">
       {letters.split("").map((letter, index) => (
         <Letter
           letter={letter}
           key={index}
-          status={keyboardStatus[letter]}
-          handleKeypress={handleKeypress}
+          status={keyResults[letter]}
+          handleLetterButtonPress={handleLetterButtonPress}
+          disabled={disabled}
         />
       ))}
     </div>
   );
 }
 
-function Letter({ letter, status, handleKeypress }) {
+function Letter({ letter, status, handleLetterButtonPress, disabled }) {
   const className = status ? `key-button ${status}` : "key-button";
   return (
-    <button className={className} onClick={() => handleKeypress(letter)}>
+    <button
+      className={className}
+      onClick={() => handleLetterButtonPress(letter)}
+      disabled={disabled}
+    >
       {letter}
     </button>
   );

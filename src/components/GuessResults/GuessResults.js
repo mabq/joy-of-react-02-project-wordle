@@ -3,24 +3,24 @@ import React from "react";
 import { GUESSES_ALLOWED } from "../../constants";
 import { range } from "../../utils";
 
-function GuessGrid({ guesses }) {
+function GuessResults({ guessResults }) {
   return (
     <div className="guess-results">
       {range(GUESSES_ALLOWED).map((num) => (
-        <Guess key={num} guess={guesses[num]} />
+        <Guess key={num} guessResult={guessResults[num]} />
       ))}
     </div>
   );
 }
 
-function Guess({ guess }) {
+function Guess({ guessResult }) {
   return (
     <p className="guess">
       {range(5).map((num) => (
         <Cell
           key={num}
-          letter={guess?.[num].letter}
-          status={guess?.[num].status}
+          letter={guessResult?.[num].letter}
+          status={guessResult?.[num].status}
         />
       ))}
     </p>
@@ -32,4 +32,4 @@ function Cell({ letter, status }) {
   return <span className={className}>{letter}</span>;
 }
 
-export default GuessGrid;
+export default GuessResults;

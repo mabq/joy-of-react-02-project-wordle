@@ -5,50 +5,70 @@ import { GUESSES_ALLOWED } from "../../constants";
 import { sample } from "../../utils";
 import { checkGuess, checkKeyStatus } from "../../game-helpers";
 
-import GuessGrid from "../GuessGrid";
+import GuessResults from "../GuessResults";
 import GuessInput from "../GuessInput";
 import Banner from "../Banner";
 
-// Pick a random word on every pageload.
-const answer = sample(WORDS);
-
-// To make debugging easier, we'll log the solution in the console.
-console.info({ answer });
-
 function Game() {
-  const [guesses, setGuesses] = React.useState([]);
-  const [keyboardStatus, setKeyboardStatus] = React.useState({});
-  const [wonWith, setWonWith] = React.useState(0);
+  const [answer, setAnswer] = React.useState(() => sample(WORDS)); // avoid executing the `sample` function on re-renders
+  const [guessResults, setGuessResults] = React.useState([]);
+  const [keyResults, setKeyResults] = React.useState({});
+  const [won, setWon] = React.useState(false);
 
-  function submitGuess(intendedGuess) {
-    const newGuess = checkGuess(intendedGuess, answer);
-    setGuesses([...guesses, newGuess]);
-    //
-    const newKeyboardStatus = { ...keyboardStatus };
-    newGuess.forEach(({ letter, status: guessStatus }) => {
-      const currentStatus = newKeyboardStatus[letter];
-      newKeyboardStatus[letter] = checkKeyStatus(guessStatus, currentStatus);
+  console.log(answer);
+
+  function resetGame() {
+    setAnswer(sample(WORDS));
+    setGuessResults([]);
+    setKeyResults({});
+    setWon(false);
+  }
+
+  function submitGuess(word) {
+    const wordResults = checkGuess(word, answer);
+    setGuessResults([...guessResults, wordResults]);
+
+    const keyResultsCopy = { ...keyResults };
+    wordResults.forEach(({ letter, status }) => {
+      const currentStatus = keyResultsCopy[letter];
+      keyResultsCopy[letter] = checkKeyStatus(status, currentStatus); // overwrite status logic
     });
-    setKeyboardStatus(newKeyboardStatus);
-    //
-    if (intendedGuess === answer) {
-      setWonWith(guesses.length);
+    setKeyResults(keyResultsCopy);
+
+    if (word === answer) {
+      setWon(true);
     }
   }
 
   return (
     <>
-      <GuessGrid guesses={guesses} />
+      <GuessResults guessResults={guessResults} />
+
       <GuessInput
         submitGuess={submitGuess}
-        keyboardStatus={keyboardStatus}
-        disabled={!!wonWith || guesses.length >= GUESSES_ALLOWED}
+        keyResults={keyResults}
+        disabled={won || guessResults.length >= GUESSES_ALLOWED}
       />
-      <Banner
-        wonWith={wonWith}
-        gameover={guesses.length >= GUESSES_ALLOWED}
-        answer={answer}
-      ></Banner>
+
+      {won && (
+        <Banner status="happy" resetGame={resetGame}>
+          <p>
+            Congratulations! Got it in
+            {guessResults.length === 1
+              ? " 1 guess"
+              : ` ${guessResults.length} guesses`}
+            .
+          </p>
+        </Banner>
+      )}
+
+      {!won && guessResults.length >= GUESSES_ALLOWED && (
+        <Banner status="sad" resetGame={resetGame}>
+          <p>
+            Sorry, the correct answer was <strong>{answer}</strong>.
+          </p>
+        </Banner>
+      )}
     </>
   );
 }
